@@ -19,6 +19,8 @@
   --radius:18px;
   --maxw:1080px;
   --shadow:0 24px 60px -24px rgba(14,27,58,.35);
+  --branco-chumbo: #aeb9d6;
+  --laranja-claro: #ffd7bf;
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
@@ -38,6 +40,7 @@ section{padding:74px 0}
   text-transform:uppercase;color:var(--sun-deep);margin-bottom:14px;display:block;
 }
 .center{text-align:center}
+.laranja-claro {color: var(--laranja-claro);}
 
 /* ============================================================
    BOTÃO CTA — grande, quente, impossível de ignorar
@@ -117,6 +120,7 @@ section{padding:74px 0}
 }
 .trust span{display:inline-flex;align-items:center;gap:7px}
 .trust .stars{color:var(--gold) !important;letter-spacing:1px}
+.branco-chumbo {color: var(--branco-chumbo);}
 
 /* ============================================================
    SEÇÕES ALTERNADAS
@@ -176,6 +180,8 @@ section{padding:74px 0}
 .boarding .bp-bar i:nth-child(2n){width:2px;opacity:.5}
 .boarding .bp-bar i:nth-child(3n){width:5px}
 .boarding .bp-bar i:nth-child(5n){width:1px;opacity:.4}
+
+.alinhar-direita { text-align: right; }
 
 .cover{
   position:relative;z-index:2;width:74%;max-width:300px;margin-top:44px;aspect-ratio:1/1.42;
