@@ -1,0 +1,295 @@
+/* ============================================================
+   TOKENS / IDENTIDADE VISUAL
+   Direção: "embarque ao entardecer" — azul-marinho de céu noturno
+   (autoridade/método) + laranja de pôr do sol na janela do avião
+   (leveza/ação). Assinatura: elementos de cartão de embarque.
+   ============================================================ */
+:root{
+  --navy:#0e1b3a;        /* primária — céu noturno */
+  --navy-2:#16264f;      /* navy mais claro p/ blocos */
+  --navy-soft:#eef1f8;   /* fundo neutro suave azulado */
+  --sun:#ff6a2b;         /* destaque — pôr do sol / CTA */
+  --sun-deep:#e8500f;    /* laranja aprofundado p/ hover */
+  --sun-soft:#fff1e9;    /* wash quente de fundo */
+  --ink:#0e1b3a;         /* texto forte */
+  --body:#3d4762;        /* texto corrido */
+  --line:#dfe3ee;        /* linhas/hairlines */
+  --white:#ffffff;
+  --gold:#f2b705;        /* estrelas de avaliação */
+  --radius:18px;
+  --maxw:1080px;
+  --shadow:0 24px 60px -24px rgba(14,27,58,.35);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Inter',system-ui,sans-serif;
+  color:var(--body);
+  background:var(--white);
+  line-height:1.65;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,.display{font-family:'Sora',sans-serif;color:var(--ink);line-height:1.15;letter-spacing:-.02em}
+.wrap{width:100%;max-width:var(--maxw);margin:0 auto;padding:0 22px}
+section{padding:74px 0}
+.eyebrow{
+  font-family:'Sora',sans-serif;font-weight:700;font-size:.74rem;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--sun-deep);margin-bottom:14px;display:block;
+}
+.center{text-align:center}
+
+/* ============================================================
+   BOTÃO CTA — grande, quente, impossível de ignorar
+   ============================================================ */
+.cta{
+  display:inline-flex;align-items:center;justify-content:center;gap:12px;
+  background:linear-gradient(180deg,var(--sun) 0%,var(--sun-deep) 100%);
+  color:#fff;font-family:'Sora',sans-serif;font-weight:800;
+  font-size:1.12rem;letter-spacing:.01em;
+  padding:22px 40px;border:none;border-radius:60px;cursor:pointer;
+  text-decoration:none;text-align:center;line-height:1.25;
+  box-shadow:0 16px 30px -10px rgba(232,80,15,.6);
+  transition:transform .18s ease, box-shadow .18s ease, filter .18s ease;
+  animation:pulse 2.6s ease-in-out infinite;
+}
+.cta:hover{transform:translateY(-3px);box-shadow:0 22px 40px -10px rgba(232,80,15,.72);filter:brightness(1.04)}
+.cta:active{transform:translateY(-1px)}
+.cta:focus-visible{outline:3px solid var(--navy);outline-offset:4px}
+.cta .arrow{font-size:1.2em;transition:transform .18s ease}
+.cta:hover .arrow{transform:translateX(4px)}
+@keyframes pulse{0%,100%{box-shadow:0 16px 30px -10px rgba(232,80,15,.6)}50%{box-shadow:0 16px 44px -6px rgba(232,80,15,.85)}}
+.cta-sub{font-size:.9rem;color:var(--body);margin-top:14px;display:flex;align-items:center;justify-content:center;gap:7px;flex-wrap:wrap}
+.cta-sub svg{flex-shrink:0}
+
+/* ============================================================
+   BARRA DE URGÊNCIA + CONTADOR
+   ============================================================ */
+.urgency{
+  background:var(--navy);color:#fff;text-align:center;
+  padding:11px 16px;font-size:.92rem;font-weight:500;
+  display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap;
+  position:sticky;top:0;z-index:50;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.urgency b{font-family:'Sora',sans-serif;font-weight:700}
+.timer{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--sun);color:#fff;font-family:'Sora',sans-serif;font-weight:800;
+  padding:4px 12px;border-radius:8px;font-variant-numeric:tabular-nums;letter-spacing:.04em;
+  font-size:.98rem;
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero{
+  position:relative;overflow:hidden;
+  background:
+    radial-gradient(900px 500px at 80% -10%, rgba(255,106,43,.22), transparent 60%),
+    radial-gradient(700px 500px at 0% 110%, rgba(74,120,220,.18), transparent 55%),
+    linear-gradient(165deg,var(--navy) 0%, #0a1530 100%);
+  color:#fff;padding:64px 0 84px;
+}
+.hero *{color:#fff}
+.hero .eyebrow{color:#ffd7bf}
+/* linha de "rota de voo" decorativa */
+.route{
+  display:flex;align-items:center;gap:10px;justify-content:center;
+  margin-bottom:22px;opacity:.9;font-size:.86rem;font-weight:600;letter-spacing:.05em;
+}
+.route .dot{width:7px;height:7px;border-radius:50%;background:var(--sun)}
+.route .dash{flex:0 0 46px;height:2px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.6) 0 6px,transparent 6px 12px)}
+.route .plane{color:var(--sun);font-size:1.1rem}
+.hero h1{
+  font-size:clamp(2.05rem,5.4vw,3.5rem);font-weight:800;max-width:16ch;margin:0 auto 20px;
+}
+.hero h1 .hl{color:var(--sun);position:relative}
+.hero .sub{
+  font-size:clamp(1.05rem,2.4vw,1.28rem);max-width:44ch;margin:0 auto 34px;
+  color:#d6ddef !important;font-weight:400;line-height:1.55;
+}
+.hero .cta-sub{color:#aeb9d6}
+.hero .cta-sub svg path{stroke:#aeb9d6}
+.trust{
+  margin-top:30px;display:flex;gap:26px;justify-content:center;flex-wrap:wrap;
+  font-size:.86rem;color:#aeb9d6 !important;
+}
+.trust span{display:inline-flex;align-items:center;gap:7px}
+.trust .stars{color:var(--gold) !important;letter-spacing:1px}
+
+/* ============================================================
+   SEÇÕES ALTERNADAS
+   ============================================================ */
+.soft{background:var(--navy-soft)}
+.warm{background:var(--sun-soft)}
+
+/* LEAD / DOR */
+.lead{max-width:720px;margin:0 auto}
+.lead h2{font-size:clamp(1.7rem,4vw,2.4rem);font-weight:800;margin-bottom:26px;text-align:center}
+.lead p{font-size:1.1rem;margin-bottom:20px}
+.lead .kicker{color:var(--sun-deep);font-weight:700}
+.lead .discovery{
+  background:#fff;border-left:5px solid var(--sun);border-radius:0 14px 14px 0;
+  padding:22px 26px;box-shadow:var(--shadow);font-size:1.12rem;color:var(--ink);font-weight:500;
+}
+
+/* BULLETS GRID */
+.sec-head{max-width:620px;margin:0 auto 48px;text-align:center}
+.sec-head h2{font-size:clamp(1.7rem,4vw,2.4rem);font-weight:800;margin-bottom:12px}
+.sec-head p{font-size:1.06rem}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+.benefit{
+  background:#fff;border:1px solid var(--line);border-radius:var(--radius);
+  padding:24px 24px;display:flex;gap:16px;align-items:flex-start;
+  transition:transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.benefit:hover{transform:translateY(-4px);box-shadow:var(--shadow);border-color:transparent}
+.benefit .ico{
+  flex-shrink:0;width:44px;height:44px;border-radius:12px;
+  background:var(--sun-soft);display:grid;place-items:center;color:var(--sun-deep);
+}
+.benefit p{font-size:1rem;color:var(--body);line-height:1.55}
+.benefit b{color:var(--ink);font-weight:700}
+
+/* APRESENTAÇÃO + MOCKUP BOARDING PASS */
+.product{display:grid;grid-template-columns:0.95fr 1.05fr;gap:56px;align-items:center}
+.product .txt h2{font-size:clamp(1.6rem,3.6vw,2.2rem);font-weight:800;margin-bottom:20px}
+.product .txt p{font-size:1.08rem;margin-bottom:16px}
+.product .txt .name{color:var(--sun-deep);font-weight:700}
+
+/* Mockup do e-book em CSS puro (capa + cartão de embarque atrás) */
+.mockup{position:relative;display:flex;justify-content:center;padding:20px 0}
+.boarding{
+  position:absolute;top:8%;right:2%;width:78%;max-width:340px;
+  background:#fff;border-radius:14px;box-shadow:var(--shadow);
+  transform:rotate(5deg);overflow:hidden;border:1px solid var(--line);
+  font-family:'Inter',sans-serif;
+}
+.boarding .bp-top{background:var(--navy);color:#fff;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;font-size:.72rem;letter-spacing:.1em}
+.boarding .bp-body{padding:14px 16px 8px;display:flex;justify-content:space-between}
+.boarding .bp-body .col small{display:block;font-size:.58rem;color:#9aa3bb;letter-spacing:.12em;text-transform:uppercase}
+.boarding .bp-body .col .big{font-family:'Sora';font-weight:800;color:var(--navy);font-size:1.5rem;line-height:1}
+.boarding .bp-arrow{color:var(--sun);align-self:center;font-size:1.1rem}
+.boarding .bp-bar{display:flex;gap:2px;padding:10px 16px 14px}
+.boarding .bp-bar i{display:block;height:34px;background:var(--navy);width:3px}
+.boarding .bp-bar i:nth-child(2n){width:2px;opacity:.5}
+.boarding .bp-bar i:nth-child(3n){width:5px}
+.boarding .bp-bar i:nth-child(5n){width:1px;opacity:.4}
+
+.cover{
+  position:relative;z-index:2;width:74%;max-width:300px;margin-top:44px;aspect-ratio:1/1.42;
+  border-radius:8px 14px 14px 8px;
+  background:
+    radial-gradient(500px 260px at 80% 0%, rgba(255,106,43,.42), transparent 60%),
+    linear-gradient(160deg,var(--navy-2) 0%, #0a1530 100%);
+  box-shadow:var(--shadow), inset 0 0 0 1px rgba(255,255,255,.06);
+  color:#fff;padding:30px 26px;display:flex;flex-direction:column;
+  border-left:6px solid rgba(255,255,255,.14);
+}
+.cover .spine{position:absolute;left:6px;top:0;bottom:0;width:2px;background:rgba(0,0,0,.25)}
+.cover .badge{font-family:'Sora';font-weight:700;font-size:.62rem;letter-spacing:.16em;text-transform:uppercase;color:var(--sun);margin-bottom:auto}
+.cover h3{color:#fff;font-family:'Sora';font-weight:800;font-size:1.72rem;line-height:1.05;margin-bottom:12px}
+.cover h3 em{color:var(--sun);font-style:normal}
+.cover .cline{width:40px;height:3px;background:var(--sun);border-radius:2px;margin:8px 0 12px}
+.cover .csub{font-size:.82rem;color:#c7d0e6;line-height:1.4}
+.cover .plane-ico{position:absolute;bottom:20px;right:22px;font-size:1.4rem;color:rgba(255,255,255,.35)}
+
+/* OBJEÇÕES / FAQ */
+.faq{max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:14px}
+.qa{background:#fff;border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.qa button{
+  width:100%;text-align:left;background:none;border:none;cursor:pointer;
+  padding:22px 24px;font-family:'Sora',sans-serif;font-weight:700;font-size:1.06rem;color:var(--ink);
+  display:flex;justify-content:space-between;align-items:center;gap:16px;line-height:1.35;
+}
+.qa button:focus-visible{outline:3px solid var(--sun);outline-offset:-3px}
+.qa .plus{flex-shrink:0;width:28px;height:28px;border-radius:50%;background:var(--sun-soft);color:var(--sun-deep);
+  display:grid;place-items:center;font-size:1.3rem;transition:transform .25s ease}
+.qa.open .plus{transform:rotate(45deg)}
+.qa .ans{max-height:0;overflow:hidden;transition:max-height .3s ease}
+.qa .ans p{padding:0 24px 22px;font-size:1.02rem;color:var(--body)}
+
+/* DEPOIMENTOS */
+.tgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}
+.tcard{
+  background:#fff;border:1px solid var(--line);border-radius:var(--radius);
+  padding:28px 26px;display:flex;flex-direction:column;box-shadow:0 10px 30px -20px rgba(14,27,58,.4);
+}
+.tcard .stars{color:var(--gold);letter-spacing:2px;font-size:1.05rem;margin-bottom:14px}
+.tcard .quote{font-size:1.02rem;color:var(--ink);line-height:1.6;margin-bottom:18px;flex:1}
+.tcard .who{display:flex;align-items:center;gap:12px;border-top:1px solid var(--line);padding-top:16px}
+.tcard .av{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--navy-2),var(--sun-deep));
+  color:#fff;font-family:'Sora';font-weight:700;display:grid;place-items:center;font-size:1rem}
+.tcard .who .n{font-weight:700;color:var(--ink);font-size:.95rem}
+.tcard .who .c{font-size:.82rem;color:var(--body)}
+
+/* PREÇO */
+.price-wrap{max-width:560px;margin:0 auto}
+.pricecard{
+  background:linear-gradient(165deg,var(--navy) 0%,#0a1530 100%);color:#fff;
+  border-radius:26px;padding:44px 38px;text-align:center;box-shadow:var(--shadow);
+  position:relative;overflow:hidden;
+}
+.pricecard::before{content:"";position:absolute;inset:0;
+  background:radial-gradient(400px 200px at 50% 0%,rgba(255,106,43,.28),transparent 60%);pointer-events:none}
+.pricecard *{position:relative;z-index:1;color:#fff}
+.pricecard .tag{font-family:'Sora';font-weight:700;font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--sun);margin-bottom:20px}
+.pricecard .anchor{font-size:1.05rem;color:#aeb9d6 !important}
+.pricecard .anchor s{opacity:.85}
+.pricecard .now{font-family:'Sora';font-weight:800;line-height:1;margin:6px 0 4px}
+.pricecard .now .cents{font-size:1.4rem;vertical-align:top}
+.pricecard .now .big{font-size:4.4rem}
+.pricecard .now .cur{font-size:1.6rem;vertical-align:top;margin-right:4px}
+.pricecard .installment{color:#d6ddef !important;font-size:.98rem;margin-bottom:26px}
+.pricecard .cta{width:100%}
+.pricecard .cta-sub{color:#aeb9d6}
+.pricecard .cta-sub svg path{stroke:#aeb9d6}
+.value-list{max-width:480px;margin:0 auto 34px;text-align:left;display:flex;flex-direction:column;gap:12px}
+.value-list li{list-style:none;display:flex;gap:12px;align-items:flex-start;font-size:1.02rem;color:var(--body)}
+.value-list .ck{flex-shrink:0;color:#12a150;margin-top:3px}
+.value-list b{color:var(--ink)}
+
+/* RODAPÉ REFORÇO */
+.finale{
+  background:linear-gradient(165deg,var(--navy) 0%,#0a1530 100%);color:#fff;text-align:center;
+}
+.finale *{color:#fff}
+.finale h2{font-size:clamp(1.7rem,4vw,2.4rem);font-weight:800;max-width:20ch;margin:0 auto 22px}
+.finale p{max-width:56ch;margin:0 auto 16px;color:#d6ddef !important;font-size:1.08rem}
+.finale .cta{margin-top:18px}
+.finale .cta-sub{color:#aeb9d6}
+.finale .cta-sub svg path{stroke:#aeb9d6}
+
+/* FOOTER LEGAL */
+footer.legal{background:#0a1226;color:#8591b3;font-size:.82rem;padding:38px 0;text-align:center}
+footer.legal .wrap{max-width:760px}
+footer.legal p{margin-bottom:8px;line-height:1.6}
+footer.legal b{color:#c7d0e6}
+
+/* ============================================================
+   RESPONSIVO
+   ============================================================ */
+@media (max-width:860px){
+  section{padding:56px 0}
+  .grid{grid-template-columns:1fr}
+  .product{grid-template-columns:1fr;gap:12px}
+  .mockup{order:-1;min-height:360px}
+  .tgrid{grid-template-columns:1fr}
+  .urgency{font-size:.82rem;gap:8px}
+}
+@media (max-width:560px){
+  .wrap{padding:0 16px}
+  .cta{width:100%;padding:20px 22px;font-size:1.02rem}
+  .hero{padding:44px 0 60px}
+  .pricecard{padding:34px 22px}
+  .pricecard .now .big{font-size:3.6rem}
+  .cover{max-width:230px}
+  .boarding{max-width:250px;right:0}
+  .route .dash{flex-basis:30px}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation:none !important;transition:none !important}
+  html{scroll-behavior:auto}
+}
