@@ -293,3 +293,23 @@ footer.legal b{color:#c7d0e6}
   *{animation:none !important;transition:none !important}
   html{scroll-behavior:auto}
 }
+
+/* ============================================================
+   CLASSES EXTRAÍDAS DE style="..." INLINE (conformidade CSP)
+   Estas classes substituem atributos style= inline que violavam
+   o Content-Security-Policy estrito (style-src 'self'). O visual
+   é idêntico ao original — só saiu do inline para cá.
+   ============================================================ */
+
+/* Legenda "avaliação dos leitores" ao lado das estrelas no hero.
+   Precisa de cor própria porque .trust .stars herda o dourado (--gold);
+   uma classe (especificidade 0,0,1,0) vence o seletor universal .hero *. */
+.avaliacao-leitores{color:#aeb9d6}
+
+/* Coluna "Para / FÉRIAS" do cartão de embarque, alinhada à direita. */
+.coluna-alinhada-direita{text-align:right}
+
+/* "Última chamada" no bloco final (fundo escuro): tom claro quente.
+   .finale *{color:#fff} tem especificidade de universal; esta classe,
+   vindo depois e com especificidade de classe, prevalece. */
+.eyebrow-ultima-chamada{color:#ffd7bf}
