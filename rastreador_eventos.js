@@ -10,6 +10,6 @@ function enviarEventoControleChaveiroMeta()
   }
 
   // dispara um sinalizador para a Meta
-  const url = "https://facebook.com/tr/" + "?id=" + ID_CONJUNTODADOS_CONTROLECHAVEIRO + "&ev=ButtonClick" + "&noscript=1" + "&cb=" + numero_cachebuster
+  const url = "https://www.facebook.com/tr" + "?id=" + ID_CONJUNTODADOS_CONTROLECHAVEIRO + "&ev=ButtonClick" + "&noscript=1" + "&cb=" + numero_cachebuster
   navigator.sendBeacon(url)
 }
