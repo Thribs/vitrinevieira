@@ -1,29 +1,28 @@
 // api/evento-meta.js
 // Função serverless (Vercel) que recebe o clique do site — first-party, então
 // bloqueadores de anúncio NÃO alcançam — e repassa o evento para a Conversions
-// API da Meta (server-side). O token de acesso fica em variável de ambiente na
-// Vercel (META_CAPI_TOKEN) e NUNCA no repositório.
+// API da Meta (server-side). Configuração sensível vem de variáveis de ambiente
+// (META_CAPI_TOKEN e META_DATASET_ID), NUNCA do repositório.
 
-const ID_CONJUNTODADOS = "1036844912059449"
 const VERSAO_GRAPH = "v21.0"
 
 // Lê o cabeçalho Cookie ("a=1; b=2") num objeto { a: "1", b: "2" }.
-function analisarCookies(cabecalho) {
+export function analisarCookies(cabecalho) {
   const mapa = {}
-  ;(cabecalho || "").split(";").forEach((parte) => {
+  for (const parte of (cabecalho || "").split(";")) {
     const igual = parte.indexOf("=")
     if (igual > -1) {
       const nome = parte.slice(0, igual).trim()
       mapa[nome] = decodeURIComponent(parte.slice(igual + 1).trim())
     }
-  })
+  }
   return mapa
 }
 
 // Monta o objeto de evento no formato da Conversions API. Sem PII: só sinais
 // técnicos (IP, user agent e os cookies _fbp/_fbc do próprio pixel, se houver),
 // que a Meta usa para a qualidade de correspondência.
-function montarEvento(req, corpo) {
+export function montarEvento(req, corpo) {
   const cookies = analisarCookies(req.headers.cookie)
   const ip = String(req.headers["x-forwarded-for"] || "").split(",")[0].trim()
   const userAgent = req.headers["user-agent"] || ""
@@ -42,14 +41,16 @@ function montarEvento(req, corpo) {
   }
 }
 
-async function handler(req, res) {
+export default async function handler(req, res) {
   if (req.method !== "POST") {
     res.status(405).json({ erro: "método não permitido" })
     return
   }
+
   const token = process.env.META_CAPI_TOKEN
-  if (!token) {
-    res.status(500).json({ erro: "META_CAPI_TOKEN ausente no ambiente" })
+  const idConjunto = process.env.META_DATASET_ID
+  if (!token || !idConjunto) {
+    res.status(500).json({ erro: "META_CAPI_TOKEN e/ou META_DATASET_ID ausentes no ambiente" })
     return
   }
 
@@ -65,8 +66,8 @@ async function handler(req, res) {
   if (corpo.test_event_code) payload.test_event_code = corpo.test_event_code
 
   const url =
-    "https://graph.facebook.com/" + VERSAO_GRAPH + "/" + ID_CONJUNTODADOS +
-    "/events?access_token=" + encodeURIComponent(token)
+    `https://graph.facebook.com/${VERSAO_GRAPH}/${idConjunto}` +
+    `/events?access_token=${encodeURIComponent(token)}`
 
   try {
     const resposta = await fetch(url, {
@@ -80,7 +81,3 @@ async function handler(req, res) {
     res.status(502).json({ erro: "falha ao falar com a Meta", detalhe: String(erro) })
   }
 }
-
-module.exports = handler
-module.exports.montarEvento = montarEvento
-module.exports.analisarCookies = analisarCookies

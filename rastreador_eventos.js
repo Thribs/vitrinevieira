@@ -1,14 +1,16 @@
-// controledochaveiro/rastreador_eventos.js
+// rastreador_eventos.js
 // Sinaliza o clique do botão de WhatsApp para a Meta, por dois caminhos com o
 // MESMO event_id (a Meta deduplica):
 //   1) /api/evento-meta  -> Conversions API no servidor (first-party, NÃO é
 //      bloqueado por ad blocker). É o caminho confiável.
 //   2) pixel /tr no navegador -> bônus quando não há bloqueador.
+//
+// O ID do pixel é público (fica no navegador de qualquer forma); a config
+// sensível (token, dataset da CAPI) mora no servidor, em variáveis de ambiente.
 
 const ID_CONJUNTODADOS_CONTROLECHAVEIRO = 1036844912059449
 
-// Global de propósito: o index.js chama esta função pelo nome no clique.
-function enviarEventoControleChaveiroMeta() {
+export function enviarEventoControleChaveiroMeta() {
   if (typeof navigator === "undefined") {
     throw new Error(
       "parâmetro navigator ausente. Verifique se o programa está sendo executado em navegador de Internet",

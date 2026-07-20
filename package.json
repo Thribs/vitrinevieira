@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "dependencies": {
     "vercel": "^56.4.0"
   }

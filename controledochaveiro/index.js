@@ -1,4 +1,5 @@
 // controledochaveiro/index.js
+import { enviarEventoControleChaveiroMeta } from "../rastreador_eventos.js"
 
 document.addEventListener("DOMContentLoaded", () => {
   if (typeof document === "undefined") {
@@ -30,14 +31,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const url = `https://wa.me/${numeroTelefone}?text=${mensagem}`
 
     window.open(url, "_blank")
-    if (typeof enviarEventoControleChaveiroMeta !== "function") {
-      // @erro: o comportamento comum de lançar erro impediria o clique de funcionar
-      console.warn(
-        "função enviarEventoControleChaveiroMeta ausente. Verifique se o script rastreador de eventos foi carregado",
-      )
-      return
-    }
 
-    enviarEventoControleChaveiroMeta()
+    // O rastreamento nunca deve quebrar o clique (por isso o try/catch).
+    try {
+      enviarEventoControleChaveiroMeta()
+    } catch (erro) {
+      console.warn("falha ao sinalizar evento para a Meta:", erro)
+    }
   })
 })
