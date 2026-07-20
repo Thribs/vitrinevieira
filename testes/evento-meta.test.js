@@ -1,6 +1,8 @@
 // testes/evento-meta.test.js — roda com: node testes/evento-meta.test.js
 // ESM (o projeto é "type": "module"). Fica FORA de /api de propósito (a Vercel
 // publicaria qualquer .js de /api como função); o .vercelignore também exclui.
+// O export default já vem embrulhado pelo middleware comTratamentoDeErros, então
+// os testes verificam a resposta HTTP final (200 / 405 / 500).
 import assert from "node:assert"
 import receberEvento, { montarEvento, analisarCookies } from "../api/evento-meta.js"
 
@@ -44,21 +46,23 @@ function respostaFalsa() {
   }
 }
 
-// receberEvento chama a Graph API com o corpo certo e devolve 200
-async function testeReceberEvento() {
+// POST válido -> 200 e chamada à Graph API com o corpo certo
+async function testeValido() {
   process.env.META_CAPI_TOKEN = "TOKEN_TESTE"
   process.env.META_DATASET_ID = "1036844912059449"
 
   let capturado = null
-  global.fetch = async (endereco, opcoes) => {
+  function fetchFalso(endereco, opcoes) {
     capturado = { endereco, corpo: JSON.parse(opcoes.body) }
-    return { ok: true, text: async () => '{"events_received":1}' }
+    function lerTexto() { return Promise.resolve('{"events_received":1}') }
+    return Promise.resolve({ ok: true, text: lerTexto })
   }
+  global.fetch = fetchFalso
 
   const requisicao = {
     method: "POST",
     headers: { "x-forwarded-for": "1.2.3.4", "user-agent": "UA" },
-    body: { event_id: "e1", test_event_code: "TEST123", event_source_url: "https://x/y" },
+    body: { event_id: "e1", test_event_code: "TEST123" },
   }
   const resposta = respostaFalsa()
   await receberEvento(requisicao, resposta)
@@ -71,10 +75,20 @@ async function testeReceberEvento() {
   assert.strictEqual(capturado.corpo.data[0].event_id, "e1")
   assert.strictEqual(capturado.corpo.data[0].user_data.client_ip_address, "1.2.3.4")
   assert.strictEqual(capturado.corpo.test_event_code, "TEST123")
-  console.log("OK: receberEvento -> Graph API")
+  console.log("OK: POST válido -> 200 + Graph API")
 }
 
-// Sem token OU sem conjunto -> 500 (não vaza, não chama a Meta)
+// Método diferente de POST -> 405 (a guarda lança, o middleware traduz)
+async function testeMetodoErrado() {
+  process.env.META_CAPI_TOKEN = "TOKEN_TESTE"
+  process.env.META_DATASET_ID = "1036844912059449"
+  const resposta = respostaFalsa()
+  await receberEvento({ method: "GET", headers: {}, body: {} }, resposta)
+  assert.strictEqual(resposta._status, 405)
+  console.log("OK: método errado -> 405")
+}
+
+// Sem token ou sem conjunto -> 500 (a guarda lança, o middleware traduz)
 async function testeConfigAusente() {
   delete process.env.META_CAPI_TOKEN
   process.env.META_DATASET_ID = "1036844912059449"
@@ -90,6 +104,7 @@ async function testeConfigAusente() {
   console.log("OK: config ausente -> 500")
 }
 
-await testeReceberEvento()
+await testeValido()
+await testeMetodoErrado()
 await testeConfigAusente()
 console.log("\nTODOS OS TESTES PASSARAM ✅")

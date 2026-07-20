@@ -3,6 +3,13 @@
 // bloqueadores de anúncio NÃO alcançam — e repassa o evento para a Conversions
 // API da Meta (server-side). Configuração sensível vem de variáveis de ambiente
 // (META_CAPI_TOKEN e META_DATASET_ID), NUNCA do repositório.
+//
+// Estilo da casa: sem try/catch, sem .catch, sem arrow. As cláusulas de guarda
+// LANÇAM erro tipado (ErroHttp), que o middleware comTratamentoDeErros traduz
+// em resposta HTTP. A rejeição da chamada à Meta é tratada como valor com
+// funções nomeadas.
+
+import { ErroHttp, comTratamentoDeErros } from "../lib/http.js"
 
 const VERSAO_GRAPH = "v21.0"
 
@@ -11,10 +18,9 @@ export function analisarCookies(cabecalho) {
   const mapa = {}
   for (const parte of (cabecalho || "").split(";")) {
     const igual = parte.indexOf("=")
-    if (igual > -1) {
-      const nome = parte.slice(0, igual).trim()
-      mapa[nome] = decodeURIComponent(parte.slice(igual + 1).trim())
-    }
+    if (igual < 0) continue
+    const nome = parte.slice(0, igual).trim()
+    mapa[nome] = decodeURIComponent(parte.slice(igual + 1).trim())
   }
   return mapa
 }
@@ -44,24 +50,22 @@ export function montarEvento(requisicao, corpo) {
   }
 }
 
-export default async function receberEvento(requisicao, resposta) {
+function receberEvento(requisicao, resposta) {
+  // Guarda: só POST.
   if (requisicao.method !== "POST") {
-    resposta.status(405).json({ erro: "método não permitido" })
-    return
+    throw new ErroHttp(405, "método não permitido")
   }
 
+  // Guarda: configuração obrigatória no ambiente.
   const token = process.env.META_CAPI_TOKEN
   const idConjunto = process.env.META_DATASET_ID
   if (!token || !idConjunto) {
-    resposta.status(500).json({ erro: "META_CAPI_TOKEN e/ou META_DATASET_ID ausentes no ambiente" })
-    return
+    throw new ErroHttp(500, "META_CAPI_TOKEN e/ou META_DATASET_ID ausentes no ambiente")
   }
 
+  // A Vercel já entrega o corpo JSON como objeto; se não vier objeto, ignora.
   let corpo = requisicao.body
-  if (typeof corpo === "string") {
-    try { corpo = JSON.parse(corpo) } catch { corpo = {} }
-  }
-  corpo = corpo || {}
+  if (!corpo || typeof corpo !== "object") corpo = {}
 
   const corpoParaMeta = { data: [montarEvento(requisicao, corpo)] }
   // Só em teste: o corpo pode trazer test_event_code para o evento aparecer no
@@ -72,15 +76,20 @@ export default async function receberEvento(requisicao, resposta) {
     `https://graph.facebook.com/${VERSAO_GRAPH}/${idConjunto}` +
     `/events?access_token=${encodeURIComponent(token)}`
 
-  try {
-    const respostaMeta = await fetch(endereco, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(corpoParaMeta),
-    })
-    const texto = await respostaMeta.text()
-    resposta.status(respostaMeta.ok ? 200 : 502).send(texto)
-  } catch (erro) {
-    resposta.status(502).json({ erro: "falha ao falar com a Meta", detalhe: String(erro) })
+  // Resposta da Meta tratada como valor (checa .ok); a rejeição de rede sobe
+  // para o middleware. Funções nomeadas, sem arrow.
+  function aoResponderMeta(respostaMeta) {
+    function aoLerCorpo(texto) {
+      resposta.status(respostaMeta.ok ? 200 : 502).send(texto)
+    }
+    return respostaMeta.text().then(aoLerCorpo)
   }
+
+  return fetch(endereco, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(corpoParaMeta),
+  }).then(aoResponderMeta)
 }
+
+export default comTratamentoDeErros(receberEvento)
