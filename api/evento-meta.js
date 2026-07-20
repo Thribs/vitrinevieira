@@ -19,65 +19,68 @@ export function analisarCookies(cabecalho) {
   return mapa
 }
 
-// Monta o objeto de evento no formato da Conversions API. Sem PII: só sinais
-// técnicos (IP, user agent e os cookies _fbp/_fbc do próprio pixel, se houver),
-// que a Meta usa para a qualidade de correspondência.
-export function montarEvento(req, corpo) {
-  const cookies = analisarCookies(req.headers.cookie)
-  const ip = String(req.headers["x-forwarded-for"] || "").split(",")[0].trim()
-  const userAgent = req.headers["user-agent"] || ""
+// Monta o objeto de evento no formato da Conversions API. Sem dados pessoais:
+// só sinais técnicos (IP, agente do usuário e os cookies _fbp/_fbc do próprio
+// pixel, se houver), que a Meta usa para a qualidade de correspondência.
+export function montarEvento(requisicao, corpo) {
+  const cookies = analisarCookies(requisicao.headers.cookie)
+  const ip = String(requisicao.headers["x-forwarded-for"] || "").split(",")[0].trim()
+  const agenteUsuario = requisicao.headers["user-agent"] || ""
   return {
     event_name: "Lead",
+    // event_time em UTC: Date.now() são milissegundos desde a época Unix (sempre
+    // UTC, independe do fuso do servidor); dividir por 1000 dá os segundos que a
+    // Conversions API exige.
     event_time: Math.floor(Date.now() / 1000),
     action_source: "website",
-    event_source_url: corpo.event_source_url || req.headers.referer || undefined,
+    event_source_url: corpo.event_source_url || requisicao.headers.referer || undefined,
     event_id: corpo.event_id || undefined, // mesmo id do pixel -> deduplicação
     user_data: {
       client_ip_address: ip || undefined,
-      client_user_agent: userAgent || undefined,
+      client_user_agent: agenteUsuario || undefined,
       fbp: cookies._fbp || undefined,
       fbc: cookies._fbc || undefined,
     },
   }
 }
 
-export default async function handler(req, res) {
-  if (req.method !== "POST") {
-    res.status(405).json({ erro: "método não permitido" })
+export default async function receberEvento(requisicao, resposta) {
+  if (requisicao.method !== "POST") {
+    resposta.status(405).json({ erro: "método não permitido" })
     return
   }
 
   const token = process.env.META_CAPI_TOKEN
   const idConjunto = process.env.META_DATASET_ID
   if (!token || !idConjunto) {
-    res.status(500).json({ erro: "META_CAPI_TOKEN e/ou META_DATASET_ID ausentes no ambiente" })
+    resposta.status(500).json({ erro: "META_CAPI_TOKEN e/ou META_DATASET_ID ausentes no ambiente" })
     return
   }
 
-  let corpo = req.body
+  let corpo = requisicao.body
   if (typeof corpo === "string") {
     try { corpo = JSON.parse(corpo) } catch { corpo = {} }
   }
   corpo = corpo || {}
 
-  const payload = { data: [montarEvento(req, corpo)] }
-  // Só em teste: o corpo pode trazer test_event_code para aparecer no
+  const corpoParaMeta = { data: [montarEvento(requisicao, corpo)] }
+  // Só em teste: o corpo pode trazer test_event_code para o evento aparecer no
   // "Testar Eventos" da Meta em tempo real (a CAPI honra esse campo).
-  if (corpo.test_event_code) payload.test_event_code = corpo.test_event_code
+  if (corpo.test_event_code) corpoParaMeta.test_event_code = corpo.test_event_code
 
-  const url =
+  const endereco =
     `https://graph.facebook.com/${VERSAO_GRAPH}/${idConjunto}` +
     `/events?access_token=${encodeURIComponent(token)}`
 
   try {
-    const resposta = await fetch(url, {
+    const respostaMeta = await fetch(endereco, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
+      body: JSON.stringify(corpoParaMeta),
     })
-    const texto = await resposta.text()
-    res.status(resposta.ok ? 200 : 502).send(texto)
+    const texto = await respostaMeta.text()
+    resposta.status(respostaMeta.ok ? 200 : 502).send(texto)
   } catch (erro) {
-    res.status(502).json({ erro: "falha ao falar com a Meta", detalhe: String(erro) })
+    resposta.status(502).json({ erro: "falha ao falar com a Meta", detalhe: String(erro) })
   }
 }
