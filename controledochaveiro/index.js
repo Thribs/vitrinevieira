@@ -1,5 +1,10 @@
 // controledochaveiro/index.js
-import { enviarEventoControleChaveiroMeta } from "../rastreador_eventos.js"
+import { enviarEventoMeta } from "../rastreador_eventos.js"
+
+// Evento que este clique representa. "Contact" é o evento padrão da Meta para
+// "alguém entrou em contato com a empresa" — que é o que abrir o WhatsApp é.
+// Troque aqui se quiser outro nome (padrão ou personalizado).
+const EVENTO_CLIQUE_WHATSAPP = "Contact"
 
 function aoClicarWhatsapp() {
   const numeroTelefone = "5512992223481"
@@ -8,7 +13,7 @@ function aoClicarWhatsapp() {
   )
   const endereco = `https://wa.me/${numeroTelefone}?text=${mensagem}`
   window.open(endereco, "_blank")
-  enviarEventoControleChaveiroMeta()
+  enviarEventoMeta(EVENTO_CLIQUE_WHATSAPP)
 }
 
 function aoCarregarPagina() {

@@ -25,15 +25,16 @@ export function analisarCookies(cabecalho) {
   return mapa
 }
 
-// Monta o objeto de evento no formato da Conversions API. Sem dados pessoais:
-// só sinais técnicos (IP, agente do usuário e os cookies _fbp/_fbc do próprio
-// pixel, se houver), que a Meta usa para a qualidade de correspondência.
+// Monta o objeto de evento no formato da Conversions API. Genérica: o nome do
+// evento (event_name) vem de quem chama — não é imposto aqui. Sem dados
+// pessoais: só sinais técnicos (IP, agente do usuário e os cookies _fbp/_fbc do
+// próprio pixel, se houver), que a Meta usa para a qualidade de correspondência.
 export function montarEvento(requisicao, corpo) {
   const cookies = analisarCookies(requisicao.headers.cookie)
   const ip = String(requisicao.headers["x-forwarded-for"] || "").split(",")[0].trim()
   const agenteUsuario = requisicao.headers["user-agent"] || ""
   return {
-    event_name: "Lead",
+    event_name: corpo.event_name,
     // event_time em UTC: Date.now() são milissegundos desde a época Unix (sempre
     // UTC, independe do fuso do servidor); dividir por 1000 dá os segundos que a
     // Conversions API exige.
@@ -66,6 +67,11 @@ function receberEvento(requisicao, resposta) {
   // A Vercel já entrega o corpo JSON como objeto; se não vier objeto, ignora.
   let corpo = requisicao.body
   if (!corpo || typeof corpo !== "object") corpo = {}
+
+  // Guarda: o evento é genérico, mas o nome é obrigatório (quem chama define).
+  if (!corpo.event_name) {
+    throw new ErroHttp(400, "event_name é obrigatório")
+  }
 
   const corpoParaMeta = { data: [montarEvento(requisicao, corpo)] }
   // Só em teste: o corpo pode trazer test_event_code para o evento aparecer no

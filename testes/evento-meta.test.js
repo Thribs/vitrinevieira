@@ -25,8 +25,8 @@ import receberEvento, { montarEvento, analisarCookies } from "../api/evento-meta
       cookie: "_fbp=fb.1.1.1",
     },
   }
-  const evento = montarEvento(requisicao, { event_id: "abc-123" })
-  assert.strictEqual(evento.event_name, "Lead")
+  const evento = montarEvento(requisicao, { event_name: "Contact", event_id: "abc-123" })
+  assert.strictEqual(evento.event_name, "Contact") // veio do corpo, não imposto
   assert.strictEqual(evento.action_source, "website")
   assert.strictEqual(evento.event_id, "abc-123")
   assert.strictEqual(evento.user_data.client_ip_address, "203.0.113.7") // 1º IP da lista
@@ -62,7 +62,7 @@ async function testeValido() {
   const requisicao = {
     method: "POST",
     headers: { "x-forwarded-for": "1.2.3.4", "user-agent": "UA" },
-    body: { event_id: "e1", test_event_code: "TEST123" },
+    body: { event_name: "Contact", event_id: "e1", test_event_code: "TEST123" },
   }
   const resposta = respostaFalsa()
   await receberEvento(requisicao, resposta)
@@ -71,7 +71,7 @@ async function testeValido() {
   assert.strictEqual(resposta._enviado, '{"events_received":1}')
   assert.ok(capturado.endereco.includes("/1036844912059449/events"), "conjunto do ambiente")
   assert.ok(capturado.endereco.includes("access_token=TOKEN_TESTE"), "token do ambiente")
-  assert.strictEqual(capturado.corpo.data[0].event_name, "Lead")
+  assert.strictEqual(capturado.corpo.data[0].event_name, "Contact")
   assert.strictEqual(capturado.corpo.data[0].event_id, "e1")
   assert.strictEqual(capturado.corpo.data[0].user_data.client_ip_address, "1.2.3.4")
   assert.strictEqual(capturado.corpo.test_event_code, "TEST123")
@@ -104,7 +104,18 @@ async function testeConfigAusente() {
   console.log("OK: config ausente -> 500")
 }
 
+// POST sem event_name -> 400 (evento é genérico, mas o nome é obrigatório)
+async function testeSemEvento() {
+  process.env.META_CAPI_TOKEN = "TOKEN_TESTE"
+  process.env.META_DATASET_ID = "1036844912059449"
+  const resposta = respostaFalsa()
+  await receberEvento({ method: "POST", headers: {}, body: { event_id: "e1" } }, resposta)
+  assert.strictEqual(resposta._status, 400)
+  console.log("OK: sem event_name -> 400")
+}
+
 await testeValido()
 await testeMetodoErrado()
 await testeConfigAusente()
+await testeSemEvento()
 console.log("\nTODOS OS TESTES PASSARAM ✅")
